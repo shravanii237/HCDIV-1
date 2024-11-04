@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Singapore 2-Hr Weather Forecast</title>
     <style>
-        /* Background gradient for the entire page */
+        /* Page background and font styling */
         body {
             background: linear-gradient(to right, #a8edea, #fed6e3);
             font-family: Arial, sans-serif;
@@ -56,6 +56,7 @@
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
         }
 
         /* Style for table headers */
@@ -69,8 +70,8 @@
         /* Style for table rows and cells */
         td {
             padding: 10px;
-            text-align: center;
             border-bottom: 1px solid #ddd;
+            font-size: 1em;
         }
 
         /* Add hover effect for rows */
@@ -81,6 +82,15 @@
         /* Style for alternating row colors */
         tr:nth-child(even) {
             background-color: #f9f9f9;
+        }
+
+        /* Fade-in animation for rows */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        tr {
+            animation: fadeIn 0.5s ease-in;
         }
     </style>
 </head>
