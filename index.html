@@ -1,7 +1,9 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Singapore 2-Hr Weather Forecast</title>
     <style>
         /* Background gradient for the entire page */
@@ -100,51 +102,59 @@
 </table>
 
 <script>
-fetch('https://api.data.gov.sg/v1/environment/2-hour-weather-forecast')
-  .then(response => response.json())
-  .then(responsedata => {
-    const timestamp = responsedata.items[0].update_timestamp;
-    const forecasts = responsedata.items[0].forecasts;
-
-    // Display the timestamp in a human-readable format
-    document.getElementById("timestring").textContent = `Last Updated: ${new Date(timestamp).toLocaleString()}`;
-
+document.addEventListener("DOMContentLoaded", () => {
     const weatherTable = document.getElementById("weatherTable");
+    const searchInput = document.getElementById("search");
 
-    // Populate the table with forecast data
-    forecasts.forEach(forecast => {
-        const row = document.createElement("tr");
+    fetch('https://api.data.gov.sg/v1/environment/2-hour-weather-forecast')
+        .then(response => response.json())
+        .then(data => {
+            const timestamp = data.items[0].update_timestamp;
+            const forecasts = data.items[0].forecasts;
 
-        const areaCell = document.createElement("td");
-        areaCell.textContent = forecast.area;
-        row.appendChild(areaCell);
+            document.getElementById("timestring").textContent = `Last Updated: ${new Date(timestamp).toLocaleString()}`;
+            populateTable(forecasts);
+        })
+        .catch(error => {
+            console.error("Error fetching data:", error);
+            document.getElementById("timestring").textContent = "Error loading data. Please try again later.";
+        });
 
-        const forecastCell = document.createElement("td");
-        forecastCell.textContent = forecast.forecast;
-        row.appendChild(forecastCell);
+    function populateTable(forecasts) {
+        forecasts.forEach(forecast => {
+            const row = document.createElement("tr");
 
-        weatherTable.appendChild(row);
-    });
+            const areaCell = document.createElement("td");
+            areaCell.textContent = forecast.area;
+            row.appendChild(areaCell);
 
-    // Search functionality for filtering table by area
-    document.getElementById("search").addEventListener("input", function() {
+            const forecastCell = document.createElement("td");
+            forecastCell.textContent = forecast.forecast;
+            row.appendChild(forecastCell);
+
+            weatherTable.appendChild(row);
+        });
+    }
+
+    // Debounce function to limit the rate of function calls
+    function debounce(func, delay) {
+        let debounceTimer;
+        return function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => func.apply(this, arguments), delay);
+        };
+    }
+
+    searchInput.addEventListener("input", debounce(function () {
         const searchValue = this.value.toLowerCase();
         const rows = weatherTable.getElementsByTagName("tr");
 
-        // Loop through each row to show or hide based on search
         for (let i = 1; i < rows.length; i++) {
             const areaCell = rows[i].getElementsByTagName("td")[0];
-            const areaText = areaCell.textContent.toLowerCase();
-
-            if (areaText.includes(searchValue)) {
-                rows[i].style.display = "";
-            } else {
-                rows[i].style.display = "none";
-            }
+            rows[i].style.display = areaCell.textContent.toLowerCase().includes(searchValue) ? "" : "none";
         }
-    });
-  })
-  .catch(error => console.error("Error fetching data:", error));
+    }, 300));
+});
 </script>
 
 </body>
