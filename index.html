@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,14 +12,14 @@
             color: #333;
             display: flex;
             flex-direction: column;
-            align-items: left;
+            align-items: center;
             margin: 0;
             padding: 20px;
         }
 
         /* Center and style the heading */
         h2 {
-            text-align: left;
+            text-align: center;
             font-size: 2em;
             color: #3B0A67;
             margin-bottom: 10px;
@@ -51,8 +50,9 @@
 
         /* Style the table */
         table {
-            width: 90%;
-            max-width: 800px;
+            width: 100%; /* Make the table full width */
+            max-width: 800px; /* Set a maximum width */
+            margin: 0 auto; /* Center the table */
             border-collapse: collapse;
             background-color: white;
             border-radius: 10px;
@@ -73,6 +73,11 @@
             padding: 10px;
             text-align: left;
             border-bottom: 1px solid #ddd;
+        }
+
+        /* Center-align forecast cells */
+        .forecast-cell {
+            text-align: center;
         }
 
         /* Add hover effect for rows */
@@ -130,6 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const forecastCell = document.createElement("td");
             forecastCell.textContent = forecast.forecast;
+            forecastCell.classList.add("forecast-cell"); // Center-align forecast text
             row.appendChild(forecastCell);
 
             weatherTable.appendChild(row);
@@ -159,3 +165,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+
