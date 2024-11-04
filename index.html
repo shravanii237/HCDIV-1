@@ -1,14 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Singapore 2-Hr Weather Forecast</title>
     <style>
         /* Background gradient for the entire page */
         body {
             background: linear-gradient(to right, #a8edea, #fed6e3);
-            font-family: Poppins, sans-serif;
+            font-family: Arial, sans-serif;
             color: #333;
             display: flex;
             flex-direction: column;
@@ -21,7 +20,7 @@
         h2 {
             text-align: center;
             font-size: 2em;
-            color: #3B0A67;
+            color: #4CAF50;
             margin-bottom: 10px;
         }
 
@@ -50,9 +49,8 @@
 
         /* Style the table */
         table {
-            width: 100%; /* Make the table full width */
-            max-width: 800px; /* Set a maximum width */
-            margin: 0 auto; /* Center the table */
+            width: 90%;
+            max-width: 800px;
             border-collapse: collapse;
             background-color: white;
             border-radius: 10px;
@@ -62,7 +60,7 @@
 
         /* Style for table headers */
         th {
-            background-color: #3B0A67;
+            background-color: #4CAF50;
             color: white;
             padding: 12px;
             font-size: 1.1em;
@@ -73,11 +71,6 @@
             padding: 10px;
             text-align: left;
             border-bottom: 1px solid #ddd;
-        }
-
-        /* Center-align forecast cells */
-        .forecast-cell {
-            text-align: center;
         }
 
         /* Add hover effect for rows */
@@ -107,62 +100,52 @@
 </table>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+fetch('https://api.data.gov.sg/v1/environment/2-hour-weather-forecast')
+  .then(response => response.json())
+  .then(responsedata => {
+    const timestamp = responsedata.items[0].update_timestamp;
+    const forecasts = responsedata.items[0].forecasts;
+
+    // Display the timestamp in a human-readable format
+    document.getElementById("timestring").textContent = `Last Updated: ${new Date(timestamp).toLocaleString()}`;
+
     const weatherTable = document.getElementById("weatherTable");
-    const searchInput = document.getElementById("search");
 
-    fetch('https://api.data.gov.sg/v1/environment/2-hour-weather-forecast')
-        .then(response => response.json())
-        .then(data => {
-            const timestamp = data.items[0].update_timestamp;
-            const forecasts = data.items[0].forecasts;
+    // Populate the table with forecast data
+    forecasts.forEach(forecast => {
+        const row = document.createElement("tr");
 
-            document.getElementById("timestring").textContent = `Last Updated: ${new Date(timestamp).toLocaleString()}`;
-            populateTable(forecasts);
-        })
-        .catch(error => {
-            console.error("Error fetching data:", error);
-            document.getElementById("timestring").textContent = "Error loading data. Please try again later.";
-        });
+        const areaCell = document.createElement("td");
+        areaCell.textContent = forecast.area;
+        row.appendChild(areaCell);
 
-    function populateTable(forecasts) {
-        forecasts.forEach(forecast => {
-            const row = document.createElement("tr");
+        const forecastCell = document.createElement("td");
+        forecastCell.textContent = forecast.forecast;
+        row.appendChild(forecastCell);
 
-            const areaCell = document.createElement("td");
-            areaCell.textContent = forecast.area;
-            row.appendChild(areaCell);
+        weatherTable.appendChild(row);
+    });
 
-            const forecastCell = document.createElement("td");
-            forecastCell.textContent = forecast.forecast;
-            forecastCell.classList.add("forecast-cell"); // Center-align forecast text
-            row.appendChild(forecastCell);
-
-            weatherTable.appendChild(row);
-        });
-    }
-
-    // Debounce function to limit the rate of function calls
-    function debounce(func, delay) {
-        let debounceTimer;
-        return function () {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => func.apply(this, arguments), delay);
-        };
-    }
-
-    searchInput.addEventListener("input", debounce(function () {
+    // Search functionality for filtering table by area
+    document.getElementById("search").addEventListener("input", function() {
         const searchValue = this.value.toLowerCase();
         const rows = weatherTable.getElementsByTagName("tr");
 
+        // Loop through each row to show or hide based on search
         for (let i = 1; i < rows.length; i++) {
             const areaCell = rows[i].getElementsByTagName("td")[0];
-            rows[i].style.display = areaCell.textContent.toLowerCase().includes(searchValue) ? "" : "none";
+            const areaText = areaCell.textContent.toLowerCase();
+
+            if (areaText.includes(searchValue)) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
         }
-    }, 300));
-});
+    });
+  })
+  .catch(error => console.error("Error fetching data:", error));
 </script>
 
 </body>
 </html>
-
